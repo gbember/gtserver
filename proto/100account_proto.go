@@ -9,6 +9,8 @@ const (
 	CS_ACCOUNT_HEART  = uint16(10006)
 	SC_ACCOUNT_HEART  = uint16(10007)
 	CS_ACCOUNT_LOGOUT = uint16(10008)
+	CS_ACCOUNT_TEST   = uint16(10009)
+	SC_ACCOUNT_TEST   = uint16(10010)
 )
 
 //请求登录
@@ -151,9 +153,8 @@ func (r *Sc_account_create) Write(p *Packet) {
 	p.writeInt8(r.Result)
 }
 
-//下线通知
+//强制下线通知
 type Sc_account_kick struct {
-	//0 => 注销下线(不发消息)
 	//1 => 服务器人数已满
 	//2 => 服务器关闭
 	//3 => 异地登陆
@@ -220,4 +221,28 @@ func (r *Cs_account_logout) WriteMsgID(p *Packet) {
 	p.writeUint16(CS_ACCOUNT_LOGOUT)
 }
 func (r *Cs_account_logout) Write(p *Packet) {
+}
+
+type Cs_account_test struct {
+}
+
+func (r *Cs_account_test) Read(p *Packet) error {
+	return nil
+}
+func (r *Cs_account_test) WriteMsgID(p *Packet) {
+	p.writeUint16(CS_ACCOUNT_TEST)
+}
+func (r *Cs_account_test) Write(p *Packet) {
+}
+
+type Sc_account_test struct {
+}
+
+func (r *Sc_account_test) Read(p *Packet) error {
+	return nil
+}
+func (r *Sc_account_test) WriteMsgID(p *Packet) {
+	p.writeUint16(SC_ACCOUNT_TEST)
+}
+func (r *Sc_account_test) Write(p *Packet) {
 }

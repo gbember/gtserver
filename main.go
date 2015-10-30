@@ -10,9 +10,11 @@ import (
 	"github.com/gbember/gt/logger"
 	"github.com/gbember/gt/module"
 	"github.com/gbember/gt/util"
+	"github.com/gbember/gtserver/common/name"
 	"github.com/gbember/gtserver/config"
 	"github.com/gbember/gtserver/db"
 	"github.com/gbember/gtserver/gateway"
+	"github.com/gbember/gtserver/word"
 )
 
 var (
@@ -26,10 +28,11 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	err = logger.StartLog(config.DataSetting.LogDir, config.DataSetting.LogLevel)
+	l, err := logger.StartLog(config.DataSetting.LogDir, config.DataSetting.LogLevel, true)
 	if err != nil {
 		panic(err)
 	}
+	logger.Export(l)
 
 	defer util.LogPanicStack()
 
@@ -41,15 +44,21 @@ func main() {
 	}
 	logger.Info("===>>配置加载成功")
 
-	console.RegisterModule(config.DataSetting.ConsoleAddr, 10, 1024)
-	gateway.RegisterModule()
-	module.Init()
-
 	err = db.Start()
 	if err != nil {
 		logger.Critical("===>数据库启动错误:%v", err)
 	}
+	logger.Info("db start...")
+	//加载所有名字
+	name.InitAllRoleName()
 
+	word.RegisterModule()
+	gateway.RegisterModule()
+	console.RegisterModule(config.DataSetting.ConsoleAddr, 10, 1024)
+	//注册方法运行时间统计命令
+	util.RegisterMTCommand()
+	module.Init()
+	logger.Info("服务器启动成功")
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt, os.Kill)
 	sig := <-c

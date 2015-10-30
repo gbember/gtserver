@@ -7,7 +7,7 @@ import (
 
 	"github.com/gbember/gt/logger"
 	"github.com/gbember/gt/util"
-	"github.com/gbember/gtserver/common"
+	"github.com/gbember/gtserver/common/gateway"
 	"github.com/gbember/gtserver/proto"
 	"github.com/gbember/gtserver/types"
 )
@@ -16,8 +16,8 @@ type roleClient struct {
 	roleID        int32
 	recv          chan proto.PMessage //接收route过来的客户端消息
 	exitCnt       chan struct{}       //退出控制
-	wgExitCnt     sync.WaitGroup      //退出等待控制
-	gw            common.Gateway      //网关
+	wgExitCnt     *sync.WaitGroup     //退出等待控制
+	gw            gateway.Gateway     //网关
 	isOK          bool                //是否无错误
 	persistTicker *time.Ticker        //持久化Ticker
 	hourTimer     *time.Timer         //整点Timer
@@ -63,7 +63,7 @@ func (rc *roleClient) loop() {
 
 func (rc *roleClient) stop() {
 	//关闭网关
-	rc.gw.Close()
+	rc.gw.Close(0)
 	defer rc.wgExitCnt.Done()
 	if rc.persistTicker != nil {
 		rc.persistTicker.Stop()

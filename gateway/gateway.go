@@ -4,6 +4,7 @@ package gateway
 import (
 	"strconv"
 
+	"github.com/gbember/gt/logger"
 	"github.com/gbember/gt/module"
 	"github.com/gbember/gt/network"
 	"github.com/gbember/gt/network/msg"
@@ -19,7 +20,6 @@ type gateway struct {
 	msgIDLen   int                       //消息ID字节数
 	maxDataLen int                       //消息最大字节数
 	agants     *concurrent.ConcurrentMap //所有在线网关
-	allNames   *concurrent.ConcurrentMap //所有名字缓存
 }
 
 var globalGW *gateway
@@ -31,6 +31,7 @@ func RegisterModule() {
 	gw.headLen = config.DataSetting.HeadLen
 	gw.msgIDLen = config.DataSetting.MsgIDLen
 	gw.maxDataLen = config.DataSetting.MaxDataLen
+	gw.agants = concurrent.NewConcurrentMap(config.DataSetting.MaxOnlineNum)
 	module.Register(gw)
 	globalGW = gw
 }
@@ -48,20 +49,7 @@ func unRegisterAgent(agent *gateway_agent) {
 	globalGW.agants.Delete(agent.roleID)
 }
 
-//注册名字
-func registerRoleName(roleID int32, roleName string) bool {
-	return globalGW.allNames.PutNotExist(roleName, roleID)
-}
-
-func (gw *gateway) OnInit() {}
-
-func (gw *gateway) OnDestroy() {
-	if gw.server != nil {
-		gw.server.Close()
-	}
-}
-
-func (gw *gateway) Run(chan bool) {
+func (gw *gateway) OnInit() {
 	msgParser, err := msg.NewMsgParserProtobuf(gw.headLen, gw.msgIDLen, gw.maxDataLen)
 	if err != nil {
 		panic(err)
@@ -71,4 +59,14 @@ func (gw *gateway) Run(chan bool) {
 		panic(err)
 	}
 	gw.server = server
+	logger.Info("gateway start...")
+}
+
+func (gw *gateway) OnDestroy() {
+	if gw.server != nil {
+		gw.server.Close()
+	}
+}
+
+func (gw *gateway) Run(chan bool) {
 }

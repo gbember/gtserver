@@ -1,0 +1,9 @@
+message sc_role_info[id=10101]{
+	required	int32		roleID			=1;
+	required	string		roleName		=2;
+	required	int8		sex				=3;
+	required	uint8		level			=4;
+	required	int32		exp				=5;
+	required	int8		vipLevel		=6;
+	required	int32		lastLogoutSec	=7;
+}
