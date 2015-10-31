@@ -1,6 +1,10 @@
 // role_data.go
 package types
 
+type RoleData struct {
+	Base *RoleInfo
+}
+
 type RoleInfo struct {
 	RoleID        int32
 	RoleName      string

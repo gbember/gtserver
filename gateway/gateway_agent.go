@@ -214,20 +214,37 @@ func (agent *gateway_agent) dispatcher(msgID uint16, msg proto.Messager) {
 		switch msgID {
 		case proto.CS_ACCOUNT_HEART:
 			agent.handle_heart(msg)
+			return
 		case proto.CS_ACCOUNT_LOGIN:
 			agent.handle_login(msg)
+			return
 		case proto.CS_ACCOUNT_CREATE:
 			agent.handle_create(msg)
+			return
+		case proto.CS_ACCOUNT_LOGOUT:
+			agent.Close(0)
+			return
 		default:
+			if agent.roleRecv == nil {
+				logger.Error("消息状态错误:%d", msgID)
+				agent.Close(0)
+			} else {
+				//分发消息到role处理
+				agent.roleRecv <- proto.PMessage{ID: msgID, Msg: msg}
+			}
+		}
+	} else {
+		if agent.roleRecv == nil {
+			logger.Error("消息状态错误:%d", msgID)
+			agent.Close(0)
+		} else {
 			//分发消息到role处理
 			agent.roleRecv <- proto.PMessage{ID: msgID, Msg: msg}
 		}
-	} else {
-		//分发消息到role处理
-		agent.roleRecv <- proto.PMessage{ID: msgID, Msg: msg}
 	}
 }
 
+//发送goroutine
 func (agent *gateway_agent) send_loop() {
 	defer util.LogPanicStack()
 	for {

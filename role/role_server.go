@@ -18,8 +18,10 @@ var (
 type handleFunc func(*roleClient, proto.Messager)
 
 func Start(r *types.RoleInfo, recv chan proto.PMessage, exitCnt chan struct{}, wgExitCnt *sync.WaitGroup, gw gateway.Gateway) {
-	rc := &roleClient{}
-	rc.dataRoleInfo = r
+	rc := new(roleClient)
+	roleData := new(types.RoleData)
+	roleData.Base = r
+	rc.RoleData = roleData
 	rc.recv = recv
 	rc.exitCnt = exitCnt
 	rc.gw = gw
@@ -35,7 +37,7 @@ func GetRoleClient(roleID int32) *roleClient {
 	return nil
 }
 func setRoleClient(rc *roleClient) {
-	allRoles.Put(rc.roleID, rc)
+	allRoles.Put(rc.RoleID, rc)
 }
 
 //注册处理函数

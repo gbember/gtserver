@@ -8,7 +8,6 @@ func init() {
 }
 
 func test(rc *roleClient, msg proto.Messager) {
-	v := msg.(*proto.Cs_account_test)
 	m := new(proto.Sc_account_test)
 	rc.gw.Send(m)
 }

@@ -13,7 +13,7 @@ import (
 )
 
 type roleClient struct {
-	roleID        int32
+	RoleID        int32
 	recv          chan proto.PMessage //接收route过来的客户端消息
 	exitCnt       chan struct{}       //退出控制
 	wgExitCnt     *sync.WaitGroup     //退出等待控制
@@ -21,7 +21,7 @@ type roleClient struct {
 	isOK          bool                //是否无错误
 	persistTicker *time.Ticker        //持久化Ticker
 	hourTimer     *time.Timer         //整点Timer
-	dataRoleInfo  *types.RoleInfo
+	RoleData      *types.RoleData
 }
 
 func (rc *roleClient) start() {
@@ -108,4 +108,8 @@ func (rc *roleClient) hook_integral_hour() {
 	case 0:
 	default:
 	}
+}
+
+func (rc *roleClient) Send(msg proto.Messager) {
+	rc.gw.Send(msg)
 }
