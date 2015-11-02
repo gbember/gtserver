@@ -250,7 +250,6 @@ func (agent *gateway_agent) send_loop() {
 	for {
 		select {
 		case msg := <-agent.recv:
-			logger.Debug("发送消息:%v", msg)
 			send_msg(agent.conn, msg, agent.rpk)
 		case <-agent.exitCnt:
 			return

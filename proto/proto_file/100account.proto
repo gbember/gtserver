@@ -54,10 +54,3 @@ message	sc_account_heart[id=10007]{
 //注销登录
 message		cs_account_logout[id=10008]{
 }
-
-message cs_account_test[id=10009]{
-	
-}
-message sc_account_test[id=10010]{
-	
-}

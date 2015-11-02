@@ -38,44 +38,14 @@ func DecodeProto(bin []byte) (msgID uint16, msg Messager, err error) {
 	switch mid {
 	case 100:
 		switch msgID {
-		case SC_ACCOUNT_TEST:
-			v := &Sc_account_test{}
+		case CS_ACCOUNT_LOGIN:
+			v := &Cs_account_login{}
 			err = v.Read(p)
 			if err == nil {
 				msg = v
 			}
 		case SC_ACCOUNT_LOGIN:
 			v := &Sc_account_login{}
-			err = v.Read(p)
-			if err == nil {
-				msg = v
-			}
-		case SC_ACCOUNT_KICK:
-			v := &Sc_account_kick{}
-			err = v.Read(p)
-			if err == nil {
-				msg = v
-			}
-		case CS_ACCOUNT_LOGOUT:
-			v := &Cs_account_logout{}
-			err = v.Read(p)
-			if err == nil {
-				msg = v
-			}
-		case CS_ACCOUNT_TEST:
-			v := &Cs_account_test{}
-			err = v.Read(p)
-			if err == nil {
-				msg = v
-			}
-		case SC_ACCOUNT_HEART:
-			v := &Sc_account_heart{}
-			err = v.Read(p)
-			if err == nil {
-				msg = v
-			}
-		case CS_ACCOUNT_LOGIN:
-			v := &Cs_account_login{}
 			err = v.Read(p)
 			if err == nil {
 				msg = v
@@ -92,8 +62,26 @@ func DecodeProto(bin []byte) (msgID uint16, msg Messager, err error) {
 			if err == nil {
 				msg = v
 			}
+		case SC_ACCOUNT_KICK:
+			v := &Sc_account_kick{}
+			err = v.Read(p)
+			if err == nil {
+				msg = v
+			}
 		case CS_ACCOUNT_HEART:
 			v := &Cs_account_heart{}
+			err = v.Read(p)
+			if err == nil {
+				msg = v
+			}
+		case SC_ACCOUNT_HEART:
+			v := &Sc_account_heart{}
+			err = v.Read(p)
+			if err == nil {
+				msg = v
+			}
+		case CS_ACCOUNT_LOGOUT:
+			v := &Cs_account_logout{}
 			err = v.Read(p)
 			if err == nil {
 				msg = v

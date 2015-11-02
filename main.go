@@ -14,6 +14,7 @@ import (
 	"github.com/gbember/gtserver/config"
 	"github.com/gbember/gtserver/db"
 	"github.com/gbember/gtserver/gateway"
+	_ "github.com/gbember/gtserver/role/fm"
 	"github.com/gbember/gtserver/word"
 )
 

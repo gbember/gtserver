@@ -11,6 +11,8 @@ type Sc_role_info struct {
 	Level         uint8
 	Exp           int32
 	VipLevel      int8
+	Gold          int32
+	Coin          int32
 	LastLogoutSec int32
 }
 
@@ -49,7 +51,17 @@ func (r *Sc_role_info) Read(p *Packet) error {
 	if err != nil {
 		return err
 	}
-	r.LastLogoutSec = value6
+	r.Gold = value6
+	value7, err := p.readInt32()
+	if err != nil {
+		return err
+	}
+	r.Coin = value7
+	value8, err := p.readInt32()
+	if err != nil {
+		return err
+	}
+	r.LastLogoutSec = value8
 	return nil
 }
 func (r *Sc_role_info) WriteMsgID(p *Packet) {
@@ -62,5 +74,7 @@ func (r *Sc_role_info) Write(p *Packet) {
 	p.writeUint8(r.Level)
 	p.writeInt32(r.Exp)
 	p.writeInt8(r.VipLevel)
+	p.writeInt32(r.Gold)
+	p.writeInt32(r.Coin)
 	p.writeInt32(r.LastLogoutSec)
 }

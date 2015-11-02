@@ -29,3 +29,7 @@ func SetGW(roleID int32, gw Gateway) {
 func DeleteGW(roleID int32) {
 	gateways.Delete(roleID)
 }
+
+func GetOnlineNum() int {
+	return gateways.Lenght()
+}
