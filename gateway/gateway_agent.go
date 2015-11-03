@@ -19,7 +19,6 @@ import (
 	"github.com/gbember/gtserver/config"
 	"github.com/gbember/gtserver/db"
 	"github.com/gbember/gtserver/proto"
-	"github.com/gbember/gtserver/role"
 	"github.com/gbember/gtserver/types"
 )
 
@@ -58,7 +57,7 @@ type gateway_agent struct {
 func NewAgent(conn net.Conn, msgParser msg.MsgParser) network.TCPAgent {
 	agent := new(gateway_agent)
 	agent.conn = conn
-	agent.msgParser = msgParser
+	agent.msgParser = msgParser.Clone()
 	agent.lastCheckSpeedSec = time.Now().Unix()
 	agent.pk = proto.NewWriter()
 	agent.exitCnt = make(chan struct{})
@@ -74,7 +73,7 @@ func (agent *gateway_agent) Run() {
 		if err != nil {
 			if !agent.isClosed {
 				if ne, ok := err.(net.Error); ok {
-					logger.Debug("网关消息接收错误:%v", ne)
+					logger.Error("网关消息接收错误:%v", ne)
 				}
 			}
 			return
@@ -86,7 +85,7 @@ func (agent *gateway_agent) Run() {
 		}
 		id, msg, err := proto.DecodeProto(dataBytes)
 		if err != nil {
-			logger.Debug("网关协议解析错误:%s", err.Error())
+			logger.Error("网关协议解析错误:%s", err.Error())
 			return
 		}
 		logger.Debug("receive msg:%d  %#v", id, msg)
@@ -99,7 +98,7 @@ func (agent *gateway_agent) check_msg_speed_lager() bool {
 	agent.receiveMsgNum++
 	if agent.receiveMsgNum >= config.DataSetting.MsgMaxSpeedNum {
 		lastCheckSpeedSec := time.Now().Unix()
-		if lastCheckSpeedSec-agent.lastCheckSpeedSec <= config.DataSetting.MsgMaxSpeedSec*int64(time.Second) {
+		if lastCheckSpeedSec-agent.lastCheckSpeedSec <= config.DataSetting.MsgMaxSpeedSec {
 			agent.lagerSpeedNum++
 			if agent.lagerSpeedNum > config.DataSetting.MsgMaxSpeedLager {
 				return true
@@ -197,14 +196,14 @@ func (agent *gateway_agent) handle_logout(proto.Messager) {
 
 //进入游戏
 func (agent *gateway_agent) enter_game(r *types.RoleInfo) {
-	agent.recv = make(chan proto.Messager, 200)
-	agent.rpk = proto.NewWriter()
-	go agent.send_loop()
-	cgw.SetGW(agent.roleID, agent)
-	roleRecv := make(chan proto.PMessage, 1)
-	agent.roleRecv = roleRecv
-	agent.wgExitCnt.Add(1)
-	role.Start(r, roleRecv, agent.exitCnt, &agent.wgExitCnt, agent)
+	//	agent.recv = make(chan proto.Messager, 200)
+	//	agent.rpk = proto.NewWriter()
+	//	go agent.send_loop()
+	//	cgw.SetGW(agent.roleID, agent)
+	//	roleRecv := make(chan proto.PMessage, 1)
+	//	agent.roleRecv = roleRecv
+	//	agent.wgExitCnt.Add(1)
+	//	role.Start(r, roleRecv, agent.exitCnt, &agent.wgExitCnt, agent)
 }
 
 //消息分发
@@ -275,7 +274,7 @@ func (agent *gateway_agent) Close(reason int8) {
 			agent.conn.Close()
 			close(agent.exitCnt)
 			agent.wgExitCnt.Wait()
-			logger.Debug("gw exit====:%d", agent.roleID)
+			logger.Debug("gw exit====:%d===reason:%d", agent.roleID, reason)
 		} else {
 			agent.closeMut.Unlock()
 		}

@@ -38,6 +38,12 @@ func DecodeProto(bin []byte) (msgID uint16, msg Messager, err error) {
 	switch mid {
 	case 100:
 		switch msgID {
+		case CS_ACCOUNT_LOGOUT:
+			v := &Cs_account_logout{}
+			err = v.Read(p)
+			if err == nil {
+				msg = v
+			}
 		case CS_ACCOUNT_LOGIN:
 			v := &Cs_account_login{}
 			err = v.Read(p)
@@ -76,12 +82,6 @@ func DecodeProto(bin []byte) (msgID uint16, msg Messager, err error) {
 			}
 		case SC_ACCOUNT_HEART:
 			v := &Sc_account_heart{}
-			err = v.Read(p)
-			if err == nil {
-				msg = v
-			}
-		case CS_ACCOUNT_LOGOUT:
-			v := &Cs_account_logout{}
 			err = v.Read(p)
 			if err == nil {
 				msg = v
