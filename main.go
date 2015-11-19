@@ -23,6 +23,15 @@ var (
 )
 
 func main() {
+	//以守护进程方式运行
+	//	if os.Getppid() != 1 {
+	//		filePath, _ := filepath.Abs(os.Args[0])
+	//		fmt.Printf("filePath=%s\n", filePath)
+	//		cmd := exec.Command(filePath, os.Args[1:]...)
+	//		cmd.Start()
+	//		return
+	//	}
+
 	runtime.GOMAXPROCS(runtime.NumCPU() * 2)
 
 	err := config.LoadConfig("setting")
