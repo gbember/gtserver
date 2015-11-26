@@ -22,5 +22,6 @@ func Start(r *types.RoleInfo, recv chan proto.PMessage, exitCnt chan struct{}, w
 	rc.exitCnt = exitCnt
 	rc.gw = gw
 	rc.wgExitCnt = wgExitCnt
+
 	go rc.start()
 }

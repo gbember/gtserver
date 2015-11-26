@@ -45,7 +45,7 @@ type gateway_agent struct {
 	lastCheckSpeedSec int64               //最后一次检查消息速度的时间
 	lagerSpeedNum     int                 //超过速度次数
 	pk                *proto.Packet       //协议encode缓存
-	closeMut          sync.Mutex          //关闭锁
+	closeMut          sync.RWMutex        //关闭锁
 	isClosed          bool                //是否关闭
 	exitCnt           chan struct{}       //退出控制
 	wgExitCnt         sync.WaitGroup      //等待发送和role的goroutine退出
@@ -283,11 +283,21 @@ func (agent *gateway_agent) Close(reason int8) {
 
 //发送消息到发送goroutine
 func (agent *gateway_agent) Send(msg proto.Messager) {
+	//	agent.closeMut.RLock()
+	if agent.isClosed {
+		//		agent.closeMut.RUnlock()
+		return
+	}
+	//	agent.closeMut.RUnlock()
+
 	agent.recv <- msg
 }
 
 //直接发送消息
 func (agent *gateway_agent) RealSend(msg proto.Messager) {
+	//	if agent.isClosed {
+	//		return
+	//	}
 	send_msg(agent.conn, msg, agent.pk)
 }
 

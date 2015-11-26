@@ -19,7 +19,7 @@ type roleAgent struct {
 	exitCnt   chan struct{}       //退出控制
 	wgExitCnt *sync.WaitGroup     //退出等待控制
 	isOK      bool                //是否无错误
-	timer     *timer.Timer
+	timer     *timer.TimerFunQueue
 	gw        gateway.Gateway
 	rd        *role.RoleData
 }
@@ -27,8 +27,7 @@ type roleAgent struct {
 func (rc *roleAgent) start() {
 	defer util.LogPanicStack()
 	defer rc.stop()
-	rc.timer = timer.NewTimer()
-	rc.rd.Timer = rc.timer
+	rc.timer = timer.NewTimerFunQueue()
 
 	role.SetRoleClient(rc.rd)
 	err := role.LoadData(rc.rd)
@@ -51,7 +50,7 @@ func (rc *roleAgent) loop() {
 			} else {
 				logger.Error("无效消息:%#v", msg)
 			}
-		case <-rc.timer.T.C:
+		case <-rc.timer.Timer.C:
 			rc.timer.Run()
 		case <-rc.exitCnt:
 			return
@@ -72,7 +71,7 @@ func (rc *roleAgent) stop() {
 }
 
 func (rc *roleAgent) addTimerFun(d time.Duration, fun func()) {
-	rc.timer.AddFun(d, fun)
+	rc.timer.AddAfterTimerFun(d, fun)
 }
 
 func persiteData(rc *roleAgent) {
